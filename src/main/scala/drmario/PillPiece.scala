@@ -1,7 +1,4 @@
 package drmario
 
-class PillPiece extends Cell {
-  def color: drmario.DMColor.Value = ???
-  def x: Int = ???
-  def y: Int = ???
+class PillPiece(val x: Int, val y: Int, val color: DMColor.Value) extends Cell {
 }
