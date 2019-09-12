@@ -19,16 +19,33 @@ object Main extends JFXApp {
 			content = canvas
 
 			onKeyPressed = (ke: KeyEvent) => {
-				println("Key pressed")
 				ke.code match {
-					case KeyCode.Left =>
-					case _ =>
+					case KeyCode.Left => board.leftPressed()
+					case KeyCode.Right => board.rightPressed()
+					case KeyCode.Up => board.upPressed()
+					case KeyCode.Down => board.downPressed()
+					case _ => 
 				}
 			}
 			
+			onKeyReleased = (ke: KeyEvent) => {
+				ke.code match {
+					case KeyCode.Left => board.leftReleased()
+					case KeyCode.Right => board.rightReleased()
+					case KeyCode.Up => board.upReleased()
+					case KeyCode.Down => board.downReleased()
+					case _ => 
+				}
+			}
+			
+			var lastTime = -1L
 			val timer = AnimationTimer(time => {
-				board.update()
-				renderer.render(board)
+				if(lastTime > 0) {
+					val delay = (time - lastTime)/1e9
+					board.update(delay)
+					renderer.render(board)
+				}
+				lastTime = time
 			})
 			timer.start()
 		}
