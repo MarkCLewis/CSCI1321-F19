@@ -40,7 +40,7 @@ object Mandelbrot extends JFXApp {
     val writer = img.pixelWriter
     val start = System.nanoTime()
     for {
-      j <- 0 until img.height().toInt
+      j <- (0 until img.height().toInt).par
       y = MinImag + j*(MaxImag-MinImag)/img.height()
       i <- 0 until img.width().toInt
       x = MinReal + i*(MaxReal-MinReal)/img.width()
