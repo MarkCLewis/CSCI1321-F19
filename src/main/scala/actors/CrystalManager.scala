@@ -3,6 +3,7 @@ import akka.actor.Actor
 import scalafx.scene.image.WritableImage
 import akka.actor.Props
 import scalafx.scene.paint.Color
+import scalafx.application.Platform
 
 class CrystalManager(img: WritableImage) extends Actor {
   val reader = img.pixelReader.get  // This is only safe because all WritableImages have defined readers.
@@ -16,10 +17,10 @@ class CrystalManager(img: WritableImage) extends Actor {
   import CrystalManager._   // Import that messages that this actor accepts.
   def receive = {
     case CheckMove(nx, ny, ox, oy) =>
-      if (ny >= img.height()) sender ! Floaty.MoveFrom(ox, 0)  // Wrap back to the top if they fall of the bottom.
+      if (ny >= img.height()) sender ! Floaty.MoveFrom(util.Random.nextInt(img.width().toInt), 0)  // Wrap back to the top if they fall of the bottom.
       else if (nx < 0 || nx >= img.width()) sender ! Floaty.MoveFrom(ox, oy) // Went out of bounds in x so don't accept new value.
       else if (reader.getColor(nx, ny) == Color.Black) {  // New position is crystal so "stick" at old location.
-        writer.setColor(ox, oy, Color.Black)
+        Platform.runLater(writer.setColor(ox, oy, Color.Black))
         sender ! Floaty.MoveFrom(util.Random.nextInt(img.width().toInt), 0)
       } else sender ! Floaty.MoveFrom(nx, ny)   // Accept new location and move again.
     case m => println("Unhandled message in manager: " + m)
