@@ -1,18 +1,26 @@
 package mud
 
 import akka.actor.Actor
+import akka.actor.ActorRef
 
 class Room(
     val keyword: String, 
     name: String, 
     desc: String, 
-    private val exits: Array[String], 
+    private val exitKeys: Array[String], 
     private var items: List[Item]) extends Actor {
 
+	private var exits: Array[Option[ActorRef]] = null
   import Room._
   def receive = {
+		case LinkExits(rooms) =>
+			exits = exitKeys.map(key => rooms.get(key))
     case GetItem(itemName) =>
-      sender ! Player.ReceiveItem(getItem(itemName))
+			sender ! Player.TakeItem(getItem(itemName))
+		case DropItem(item) =>
+  	case GetExit(dir) =>
+		case GetDescription =>
+			sender ! Player.PrintMessage(description())
     case m => println("Unhandled message in Room: " + m)
   }
 
@@ -21,12 +29,12 @@ class Room(
 	}
 	def printExits(): String = {
 		var x = "Exits: "
-		if (exits(0) != "-1") x += "north "
-		if (exits(1) != "-1") x += "south "
-		if (exits(2) != "-1") x += "east "
-		if (exits(3) != "-1") x += "west "
-		if (exits(4) != "-1") x += "up "
-		if (exits(5) != "-1") x += "down "
+		if (exits(0).nonEmpty) x += "north "
+		if (exits(1).nonEmpty) x += "south "
+		if (exits(2).nonEmpty) x += "east "
+		if (exits(3).nonEmpty) x += "west "
+		if (exits(4).nonEmpty) x += "up "
+		if (exits(5).nonEmpty) x += "down "
 		x
 	}
 	def printItems(): String = {
@@ -36,8 +44,8 @@ class Room(
 		}
 		y
 	}
-	def getExit(dir: Int): Option[Room] = {
-		Room.rooms.get(exits(dir))
+	def getExit(dir: Int): Option[ActorRef] = {
+		exits(dir)
 	}
 	def getItem(itemName: String): Option[Item] = {
 		var y: Boolean = false
@@ -63,5 +71,6 @@ object Room {
   case class GetItem(itemName: String)
   case class DropItem(item: Item)
   case class GetExit(dir: Int)
-  case object GetDescription
+	case object GetDescription
+	case class LinkExits(rooms: Map[String, ActorRef])
 }
