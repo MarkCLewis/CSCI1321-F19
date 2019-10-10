@@ -32,7 +32,6 @@ object Main extends JFXApp {
 				ke.code match {
 					case KeyCode.Left => board.leftReleased()
 					case KeyCode.Right => board.rightReleased()
-					case KeyCode.Up => board.upReleased()
 					case KeyCode.Down => board.downReleased()
 					case _ => 
 				}
