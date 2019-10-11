@@ -21,6 +21,13 @@ object Client extends JFXApp {
   val out = new ObjectOutputStream(sock.getOutputStream())
   val in = new ObjectInputStream(sock.getInputStream())
 
+  val keyMap = Map[KeyCode, KeyEnums.Value](
+    KeyCode.Left -> KeyEnums.Left,
+    KeyCode.Right -> KeyEnums.Right,
+    KeyCode.Up -> KeyEnums.Up,
+    KeyCode.Down -> KeyEnums.Down
+  ).withDefaultValue(KeyEnums.Other)
+
   stage = new JFXApp.PrimaryStage {
 		title = "Dr. Mario"
 		scene = new Scene(800, 800) {
@@ -28,25 +35,12 @@ object Client extends JFXApp {
 
 			onKeyPressed = (ke: KeyEvent) => {
         out.writeInt(98)
-        out.writeObject(ke.code)
-				// ke.code match {
-				// 	case KeyCode.Left => board.leftPressed()
-				// 	case KeyCode.Right => board.rightPressed()
-				// 	case KeyCode.Up => board.upPressed()
-				// 	case KeyCode.Down => board.downPressed()
-				// 	case _ => 
-				// }
+        out.writeObject(keyMap(ke.code))
 			}
 			
 			onKeyReleased = (ke: KeyEvent) => {
         out.writeInt(97)
-        out.writeObject(ke.code)
-				// ke.code match {
-				// 	case KeyCode.Left => board.leftReleased()
-				// 	case KeyCode.Right => board.rightReleased()
-				// 	case KeyCode.Down => board.downReleased()
-				// 	case _ => 
-				// }
+        out.writeObject(keyMap(ke.code))
       }
       
       Future {
