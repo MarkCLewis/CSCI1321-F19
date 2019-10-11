@@ -14,6 +14,10 @@ case class Pill(pieces: List[PillPiece]) extends BoardElement {
     if(allowMove(dx, dy, grid)) new Pill(pieces.map(_.move(dx, dy))) else this
   }
 
+  def makePassable: PassableElement = {
+    PassableElement(cells.map(c => PassableCell(c.x, c.y, c.color, 1)))
+  }
+
   def rotate(grid: Map[(Int, Int), BoardElement]): Pill = {
     pieces match {
       case Nil => this

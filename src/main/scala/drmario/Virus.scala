@@ -6,4 +6,5 @@ case class Virus(x: Int, y: Int, color: DMColor.Value) extends Cell with BoardEl
   def supported(grid: Map[(Int, Int), BoardElement]): Boolean = true
   def move(dx: Int, dy: Int, grid: Map[(Int, Int), BoardElement]): BoardElement =
     throw new UnsupportedOperationException("Tried to move a virus.")
+  def makePassable: PassableElement = PassableElement(List(PassableCell(x, y, color, 0)))
 }

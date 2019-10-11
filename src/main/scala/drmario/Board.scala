@@ -34,6 +34,10 @@ class Board {
   def rightReleased() = rightHeld = false
   def downReleased() = downHeld = false
 
+  def makePassable: PassableBoard = {
+    PassableBoard(elements.map(_.makePassable), currentPill.makePassable)
+  }
+
   def update(delay: Double): Unit = {
     dropDelay += delay
     moveDelay += delay
