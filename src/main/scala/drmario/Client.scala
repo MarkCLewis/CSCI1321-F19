@@ -51,10 +51,13 @@ object Client extends JFXApp {
       
       Future {
         while (true) {
-          val pb = in.readObject() match {
+          val pb1 = in.readObject() match {
             case board: PassableBoard => board
           }
-          Platform.runLater(renderer.render(pb))
+          val pb2 = in.readObject() match {
+            case board: PassableBoard => board
+          }
+          Platform.runLater(renderer.render(pb1, pb2))
         }
       }
     }

@@ -43,7 +43,7 @@ object Main extends JFXApp {
 					val delay = (time - lastTime)/1e9
 					board.update(delay)
 					val pb = board.makePassable
-					renderer.render(pb)
+					renderer.render(pb, pb)
 				}
 				lastTime = time
 			})
