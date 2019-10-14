@@ -29,16 +29,23 @@ class Julia(c: Complex) {
   def drawJulia(img: WritableImage): Unit = {
     val writer = img.pixelWriter
     val start = System.nanoTime()
-    val futures = for {
-      j <- 0 until img.height().toInt
-      y = MinImag + j*(MaxImag-MinImag)/img.height()
-      i <- 0 until img.width().toInt
-      x = MinReal + i*(MaxReal-MinReal)/img.width()
-    } yield Future {
-      val cnt = juliaCount(Complex(x, y))
-      writer.setColor(i, j, Mandelbrot.mandelColor(cnt))
+    val futures = for (j <- 0 until img.height().toInt) yield Future {
+      val y = MinImag + j*(MaxImag-MinImag)/img.height()
+      val colors = for (i <- 0 until img.width().toInt) yield {
+        val x = MinReal + i*(MaxReal-MinReal)/img.width()
+        val cnt = juliaCount(Complex(x, y))
+        Mandelbrot.mandelColor(cnt)
+      }
+      (j, colors)
     }
-    Future.sequence(futures).foreach( _ => println(s"Drawing time: ${(System.nanoTime - start) * 1e-9} seconds"))
+    val f = Future.sequence(futures).map { rows => 
+      Platform.runLater {
+        for ((i, colors) <- rows) {
+          for (j <- colors.indices) writer.setColor(i, j, colors(j))
+        }
+      }
+    }
+    f.foreach( _ => println(s"Drawing time: ${(System.nanoTime - start) * 1e-9} seconds"))
   }
 
   def juliaCount(z0: Complex): Int = {
