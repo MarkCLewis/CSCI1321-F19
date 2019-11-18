@@ -9,9 +9,14 @@ class SinglyLinkedList[A] extends collection.mutable.Buffer[A] {
   def length: Int = numElems
 
   def +=(a: A) = {
-    tl = new Node[A](a, null)
-    tl = tl.next
-    if (hd == null) hd = tl
+    val n = new Node[A](a, null)
+    if (tl == null) {
+      hd = n
+      tl = n
+    } else {
+      tl.next = n
+      tl = n
+    }
     numElems += 1
     this
   }

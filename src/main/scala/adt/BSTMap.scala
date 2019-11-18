@@ -1,6 +1,7 @@
 package adt
 
 import collection.mutable
+import scala.concurrent.java8.FuturesConvertersImpl.P
 
 class BSTMap[K, V](lt: (K, K) => Boolean) extends mutable.Map[K, V] {
   import BSTMap._
@@ -42,10 +43,37 @@ class BSTMap[K, V](lt: (K, K) => Boolean) extends mutable.Map[K, V] {
   }
   
   def -=(key: K) = {
-    // find it
-    // check special cases, 0 or 1 children
-    // otherwise replace with smallest on right
-    ???
+    def mainHelper(n: Node[K, V]): Node[K, V] = {
+      if (key == n.key) {
+        if (n.left == null) n.right
+        else if (n.right == null) n.left
+        else {
+          val (replacement, rightChild) = removeMin(n.right)
+          replacement.left = n.left
+          replacement.right = rightChild
+          replacement
+        }
+      } else if (lt(key, n.key)) {
+        n.left = mainHelper(n.left)
+        n
+      } else {
+        n.right = mainHelper(n.right)
+        n
+      }
+    }
+
+    // Returns the minimum node in this subtree followed by the node that should be connected to.
+    def removeMin(n: Node[K, V]): (Node[K, V], Node[K, V]) = {
+      if (n.left == null) (n, n.right)
+      else {
+        val (replacement, child) = removeMin(n.left)
+        n.left = child
+        (replacement, n)
+      }
+    }
+
+    root = mainHelper(root)
+    this
   }
 
   def +=(kv: (K, V)) = {
@@ -53,9 +81,9 @@ class BSTMap[K, V](lt: (K, K) => Boolean) extends mutable.Map[K, V] {
       if (n == null) { 
         new Node[K, V](kv._1, kv._2, null, null)
       } else {
-        if (n.key == kv._1) {
+        if (kv._1 == n.key) {
           n.value = kv._2
-        } else if (lt(n.key, kv._1)) {
+        } else if (lt(kv._1, n.key)) {
           n.left = helper(n.left)
         } else {
           n.right = helper(n.right)
